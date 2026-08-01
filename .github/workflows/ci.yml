@@ -47,7 +47,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: ${{ matrix.rust }}
     - name: Initialize cache
@@ -71,7 +71,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: nightly
         components: miri
@@ -95,7 +95,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: stable
     - name: Initialize cache
@@ -118,11 +118,11 @@ jobs:
       with:
         persist-credentials: false
     - name: Install stable Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: stable
     - name: Install nightly Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: nightly
     - name: Downgrade dependencies to minimal versions
@@ -137,7 +137,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: stable
     - name: Initialize cache
@@ -153,7 +153,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: "1.97"  # STABLE
     - name: Initialize cache
@@ -171,7 +171,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: "1.97"  # STABLE
         components: rustfmt
@@ -190,7 +190,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: "1.97"  # STABLE
         components: clippy
@@ -225,7 +225,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@4be7066ada62dd38de10e7b70166bc74ed198c30 # stable
+      uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
       with:
         toolchain: stable
     - name: Initialize cache
