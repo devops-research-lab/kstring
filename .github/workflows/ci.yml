@@ -1,55 +1,39 @@
 name: CI
-
 permissions:
   contents: read
-
 on:
-  pull_request:
-  push:
-    branches:
-    - master
-
+  push: null
 env:
   RUST_BACKTRACE: 1
   CARGO_TERM_COLOR: always
   CLICOLOR: 1
-
 jobs:
-  ci:
-    permissions:
-      contents: none
-    name: CI
-    needs: [test, miri, msrv, docs, rustfmt, clippy]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Done
-        run: exit 0
   test:
     name: Test
     strategy:
       matrix:
         target:
-          - i686-pc-windows-msvc
-          - x86_64-pc-windows-msvc
-          - x86_64-unknown-linux-gnu
-          - i686-unknown-linux-gnu
-          - x86_64-apple-darwin
+        - i686-pc-windows-msvc
+        - x86_64-pc-windows-msvc
+        - x86_64-unknown-linux-gnu
+        - i686-unknown-linux-gnu
+        - x86_64-apple-darwin
         include:
-          - target: i686-pc-windows-msvc
-            os: windows-latest
-            rust: stable
-          - target: x86_64-pc-windows-msvc
-            os: windows-latest
-            rust: stable
-          - target: x86_64-unknown-linux-gnu
-            os: ubuntu-latest
-            rust: stable
-          - target: i686-unknown-linux-gnu
-            os: ubuntu-latest
-            rust: stable
-          - target: x86_64-apple-darwin
-            os: macos-latest
-            rust: stable
+        - target: i686-pc-windows-msvc
+          os: windows-latest
+          rust: stable
+        - target: x86_64-pc-windows-msvc
+          os: windows-latest
+          rust: stable
+        - target: x86_64-unknown-linux-gnu
+          os: ubuntu-latest
+          rust: stable
+        - target: i686-unknown-linux-gnu
+          os: ubuntu-latest
+          rust: stable
+        - target: x86_64-apple-darwin
+          os: macos-latest
+          rust: stable
     continue-on-error: ${{ matrix.rust != 'stable' }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -62,9 +46,11 @@ jobs:
         targets: ${{ matrix.target }}
     - name: Install linker
       if: matrix.target == 'i686-unknown-linux-gnu'
-      run: |
-        sudo apt-get update
+      run: 'sudo apt-get update
+
         sudo apt-get install gcc-multilib
+
+        '
     - uses: Swatinem/rust-cache@v2
     - name: Build
       run: cargo test --target ${{ matrix.target }} --no-run --workspace --all-features
@@ -74,41 +60,6 @@ jobs:
       run: cargo test --target ${{ matrix.target }} --workspace --all-features
     - name: No-default features
       run: cargo test --target ${{ matrix.target }} --workspace --no-default-features --features std
-  miri:
-    name: Miri
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: nightly
-        components: miri
-    - uses: Swatinem/rust-cache@v2
-    - name: Default features
-      run: cargo miri test
-    - name: All features
-      run: cargo miri test --all-features
-    - name: No-default features
-      run: cargo miri test --no-default-features --features std
-  msrv:
-    name: "Check MSRV: 1.87.0"
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: "1.87.0"  # MSRV
-    - uses: Swatinem/rust-cache@v2
-    - name: Default features
-      run: cargo check --workspace --all-targets
-    - name: All features
-      run: cargo check --workspace --all-targets --all-features
-    - name: No-default features
-      run: cargo check --workspace --all-targets --no-default-features --features std
   lockfile:
     runs-on: ubuntu-latest
     steps:
@@ -119,63 +70,29 @@ jobs:
       with:
         toolchain: stable
     - uses: Swatinem/rust-cache@v2
-    - name: "Is lockfile updated?"
+    - name: Is lockfile updated?
       run: cargo fetch --locked
-  docs:
-    name: Docs
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        toolchain: stable
-    - uses: Swatinem/rust-cache@v2
-    - name: Check documentation
-      env:
-        RUSTDOCFLAGS: -D warnings
-      run: cargo doc --workspace --all-features --no-deps --document-private-items
-  rustfmt:
-    name: rustfmt
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        # Not MSRV because its harder to jump between versions and people are
-        # more likely to have stable
-        toolchain: stable
-        components: rustfmt
-    - uses: Swatinem/rust-cache@v2
-    - name: Check formatting
-      run: cargo fmt --all -- --check
   clippy:
-    name: clippy
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write # to upload sarif results
+    needs: test
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
     - name: Install Rust
       uses: dtolnay/rust-toolchain@stable
       with:
-        toolchain: "1.87.0"  # MSRV
+        toolchain: 1.85.0
         components: clippy
     - uses: Swatinem/rust-cache@v2
     - name: Install SARIF tools
-      run: cargo install clippy-sarif --version 0.3.4 --locked  # Held back due to msrv
+      run: cargo install clippy-sarif --version 0.3.4 --locked
     - name: Install SARIF tools
-      run: cargo install sarif-fmt --version 0.3.4 --locked # Held back due to msrv
+      run: cargo install sarif-fmt --version 0.3.4 --locked
     - name: Check
-      run: >
-        cargo clippy --workspace --all-features --all-targets --message-format=json -- -D warnings --allow deprecated
-        | clippy-sarif
-        | tee clippy-results.sarif
-        | sarif-fmt
+      run: 'cargo clippy --workspace --all-features --all-targets --message-format=json -- -D warnings
+        --allow deprecated | clippy-sarif | tee clippy-results.sarif | sarif-fmt
+
+        '
       continue-on-error: true
     - name: Upload
       uses: github/codeql-action/upload-sarif@v3
@@ -184,3 +101,61 @@ jobs:
         wait-for-processing: true
     - name: Report status
       run: cargo clippy --workspace --all-features --all-targets -- -D warnings --allow deprecated
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+      if: '!cancelled()'
+    - uses: Swatinem/rust-cache@v2
+      if: '!cancelled()'
+    - name: Check documentation
+      env:
+        RUSTDOCFLAGS: -D warnings
+      run: cargo doc --workspace --all-features --no-deps --document-private-items
+      if: '!cancelled()'
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: nightly
+        components: miri
+      if: '!cancelled()'
+    - uses: Swatinem/rust-cache@v2
+      if: '!cancelled()'
+    - name: Default features
+      run: cargo miri test
+      if: '!cancelled()'
+    - name: All features
+      run: cargo miri test --all-features
+      if: '!cancelled()'
+    - name: No-default features
+      run: cargo miri test --no-default-features --features std
+      if: '!cancelled()'
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: 1.85.0
+      if: '!cancelled()'
+    - uses: Swatinem/rust-cache@v2
+      if: '!cancelled()'
+    - name: Default features
+      run: cargo check --workspace --all-targets
+      if: '!cancelled()'
+    - name: All features
+      run: cargo check --workspace --all-targets --all-features
+      if: '!cancelled()'
+    - name: No-default features
+      run: cargo check --workspace --all-targets --no-default-features --features std
+      if: '!cancelled()'
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: stable
+        components: rustfmt
+      if: '!cancelled()'
+    - uses: Swatinem/rust-cache@v2
+      if: '!cancelled()'
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+      if: '!cancelled()'
+    - name: Done
+      run: exit 0
